@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { buttonVariants } from "@/lib/button-variants";
 import { Card, CardContent } from "@/components/ui/card";
-import { Zap, MessageCircle, History, Stethoscope, FileText } from "lucide-react";
+import { Zap, MessageCircle, History, Stethoscope, FileText, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const cardVariants = {
@@ -38,6 +38,13 @@ const cards = [
     description: "業種×用途別のプリセットからカスタマイズして生成",
     href: "/templates",
     label: "テンプレートを見る",
+  },
+  {
+    icon: Sparkles,
+    title: "プロンプト改善",
+    description: "既存プロンプトをAIが自動でリライトし、より効果的に",
+    href: "/improve",
+    label: "改善する",
   },
   {
     icon: Stethoscope,

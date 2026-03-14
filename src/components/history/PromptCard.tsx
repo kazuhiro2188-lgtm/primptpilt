@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/shared/CopyButton";
-import { Star, Pencil, Trash2, Target } from "lucide-react";
+import { Star, Pencil, Trash2, Target, Sparkles } from "lucide-react";
 import type { PromptHistory } from "@/types/prompt";
 import { CATEGORIES } from "@/lib/constants";
 import { useRouter } from "next/navigation";
@@ -21,6 +21,10 @@ export function PromptCard({ item, onToggleFavorite, onDelete }: PromptCardProps
 
   const handleEdit = () => {
     router.push(`/generate?goal=${encodeURIComponent(item.goal)}&category=${item.category}&tone=${item.tone}&outputFormat=${item.outputFormat}`);
+  };
+
+  const handleImprove = () => {
+    router.push(`/improve?prompt=${encodeURIComponent(item.generatedPrompt)}`);
   };
 
   return (
@@ -56,6 +60,10 @@ export function PromptCard({ item, onToggleFavorite, onDelete }: PromptCardProps
           <Button variant="outline" size="sm" onClick={handleEdit}>
             <Pencil className="h-4 w-4 mr-2" />
             再編集
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleImprove}>
+            <Sparkles className="h-4 w-4 mr-2" />
+            改善
           </Button>
         </div>
       </CardContent>

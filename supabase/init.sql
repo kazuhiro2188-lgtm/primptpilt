@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS public.prompts (
   audience TEXT,
   extra TEXT,
   generated_prompt TEXT NOT NULL,
-  generation_mode TEXT DEFAULT 'quick' CHECK (generation_mode IN ('quick', 'hearing', 'template')),
+  generation_mode TEXT DEFAULT 'quick' CHECK (generation_mode IN ('quick', 'hearing', 'template', 'improve')),
   is_favorite BOOLEAN DEFAULT FALSE,
   folder_id UUID REFERENCES public.folders(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),

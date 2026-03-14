@@ -10,6 +10,7 @@ import {
   Settings,
   Stethoscope,
   FileText,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,7 @@ const navItems = [
   { href: "/generate", label: "クイック生成", icon: Zap },
   { href: "/hearing", label: "ヒアリング", icon: MessageCircle },
   { href: "/templates", label: "テンプレート", icon: FileText },
+  { href: "/improve", label: "プロンプト改善", icon: Sparkles },
   { href: "/diagnose", label: "診断", icon: Stethoscope },
   { href: "/history", label: "履歴", icon: History },
   { href: "/settings", label: "設定", icon: Settings },

@@ -17,6 +17,7 @@ const navItems = [
   { href: "/generate", label: "クイック生成" },
   { href: "/hearing", label: "ヒアリング" },
   { href: "/templates", label: "テンプレート" },
+  { href: "/improve", label: "プロンプト改善" },
   { href: "/diagnose", label: "診断" },
   { href: "/history", label: "履歴" },
 ];

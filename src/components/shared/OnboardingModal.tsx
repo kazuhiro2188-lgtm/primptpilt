@@ -104,7 +104,7 @@ export function OnboardingModal() {
               )}
               {isLast ? (
                 <Link
-                  href="/generate"
+                  href="/"
                   className={cn(buttonVariants(), "inline-flex")}
                   onClick={completeOnboarding}
                 >

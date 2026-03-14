@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -9,7 +10,7 @@ import { RadarChart } from "./RadarChart";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import type { DiagnoseResult } from "@/types/diagnose";
 import { toast } from "sonner";
-import { Stethoscope } from "lucide-react";
+import { Stethoscope, Sparkles } from "lucide-react";
 
 export function DiagnoseForm() {
   const [prompt, setPrompt] = useState("");
@@ -87,9 +88,17 @@ export function DiagnoseForm() {
           )}
         </Button>
         {result && (
-          <Button variant="outline" onClick={handleReset}>
-            やり直す
-          </Button>
+          <>
+            <Button variant="outline" onClick={handleReset}>
+              やり直す
+            </Button>
+            <Link href={`/improve?prompt=${encodeURIComponent(prompt)}`}>
+              <Button variant="outline">
+                <Sparkles className="h-4 w-4 mr-2" />
+                プロンプト改善へ
+              </Button>
+            </Link>
+          </>
         )}
       </div>
 

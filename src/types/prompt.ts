@@ -34,7 +34,7 @@ export interface PromptHistory {
   audience?: string;
   extra?: string;
   generatedPrompt: string;
-  generationMode: "quick" | "hearing" | "template";
+  generationMode: "quick" | "hearing" | "template" | "improve";
   isFavorite: boolean;
   createdAt: string;
 }
