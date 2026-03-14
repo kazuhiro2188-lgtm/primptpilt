@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { Menu, Sun, Moon, LogIn, LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, Sun, Moon, LogIn, LogOut, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUIStore } from "@/stores/uiStore";
 import { useAuthStore } from "@/stores/authStore";
@@ -24,6 +24,7 @@ const navItems = [
 export function Header() {
   const [authOpen, setAuthOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
   const { theme, setTheme } = useUIStore();
   const { user, signOut } = useAuthStore();
@@ -33,6 +34,14 @@ export function Header() {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
     document.documentElement.classList.toggle("dark", next === "dark");
+  };
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      router.back();
+      return;
+    }
+    router.push("/");
   };
 
   return (
@@ -46,21 +55,39 @@ export function Header() {
         >
           <Menu className="h-5 w-5" />
         </Button>
+        {pathname !== "/" && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleBack}
+            className={cn(
+              "gap-1 transition-all duration-200 hover:scale-105 hover:-translate-y-0.5",
+              "bg-transparent hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-500/20 dark:hover:text-blue-400"
+            )}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            戻る
+          </Button>
+        )}
         <Link href="/" className="flex items-center font-semibold">
           <Image
             src="/images/promptpilot_sub.png"
             alt="PromptPilot"
             width={60}
             height={60}
-            className="h-[60px] w-auto"
+            className="h-[80px] w-auto"
           />
         </Link>
-        <nav className="hidden md:flex items-center gap-1 flex-1">
+        <nav className="hidden md:flex items-center gap-1 ml-auto">
           {navItems.map((item) => (
             <Link key={item.href} href={item.href}>
               <Button
-                variant={pathname === item.href ? "secondary" : "ghost"}
+                variant="ghost"
                 size="sm"
+                className={cn(
+                  "transition-all duration-200 hover:scale-105 hover:-translate-y-0.5",
+                  "bg-transparent hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-500/20 dark:hover:text-blue-400"
+                )}
               >
                 {item.label}
               </Button>

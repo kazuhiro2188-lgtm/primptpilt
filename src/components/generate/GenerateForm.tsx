@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 import { CategorySelector } from "./CategorySelector";
 import { ToneSelector } from "./ToneSelector";
 import { OutputFormatSelector } from "./OutputFormatSelector";
@@ -15,6 +16,8 @@ import { usePromptStore } from "@/stores/promptStore";
 import { CATEGORIES, TONES, OUTPUT_FORMATS } from "@/lib/constants";
 import type { CategoryId, ToneId, OutputFormatId } from "@/types/prompt";
 import { toast } from "sonner";
+import { ChevronDown, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function GenerateForm() {
   const searchParams = useSearchParams();
@@ -133,77 +136,118 @@ export function GenerateForm() {
     handleGenerate();
   };
 
+  const hasOptions = audience.trim() || extra.trim();
+  const [showOptions, setShowOptions] = useState(false);
+
+  useEffect(() => {
+    if (hasOptions) setShowOptions(true);
+  }, [hasOptions]);
+
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="goal">やりたいこと</Label>
-        <Textarea
-          id="goal"
-          placeholder="例: 新商品のInstagram投稿文を作りたい"
-          value={goal}
-          onChange={(e) => setGoal(e.target.value)}
-          rows={4}
-          className="resize-none"
-        />
-      </div>
+    <div className="grid gap-8 lg:grid-cols-[1fr,minmax(360px,1fr)] lg:items-start">
+      {/* フォーム */}
+      <Card className="overflow-hidden">
+        <CardContent className="p-6 space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="goal" className="text-sm font-medium">
+              やりたいこと
+            </Label>
+            <Textarea
+              id="goal"
+              placeholder="例: 新商品のInstagram投稿文を作りたい"
+              value={goal}
+              onChange={(e) => setGoal(e.target.value)}
+              rows={4}
+              className="resize-none min-h-[100px] rounded-lg border-input focus-visible:ring-2"
+            />
+          </div>
 
-      <div className="space-y-2">
-        <Label>カテゴリ</Label>
-        <CategorySelector value={category} onChange={setCategory} />
-      </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">カテゴリ</Label>
+            <CategorySelector value={category} onChange={setCategory} />
+          </div>
 
-      <div className="space-y-2">
-        <Label>トーン</Label>
-        <ToneSelector value={tone} onChange={setTone} />
-      </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">トーン</Label>
+              <ToneSelector value={tone} onChange={setTone} />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">出力形式</Label>
+              <OutputFormatSelector value={outputFormat} onChange={setOutputFormat} />
+            </div>
+          </div>
 
-      <div className="space-y-2">
-        <Label>出力形式</Label>
-        <OutputFormatSelector value={outputFormat} onChange={setOutputFormat} />
-      </div>
+          {/* 詳細オプション（折りたたみ） */}
+          <div className="border rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowOptions((o) => !o)}
+              className="flex w-full items-center gap-2 px-4 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors text-left"
+            >
+              <ChevronDown className={cn("h-4 w-4 transition-transform", showOptions && "rotate-180")} />
+              詳細オプション {hasOptions && <span className="text-primary text-xs">(入力済み)</span>}
+            </button>
+            {showOptions && (
+            <div className="px-4 pb-4 pt-1 space-y-4 border-t bg-muted/20">
+              <div className="space-y-2">
+                <Label htmlFor="audience" className="text-sm font-medium text-muted-foreground">
+                  対象ユーザー
+                </Label>
+                <Input
+                  id="audience"
+                  placeholder="例: 20代女性"
+                  value={audience}
+                  onChange={(e) => setAudience(e.target.value)}
+                  className="rounded-lg"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="extra" className="text-sm font-medium text-muted-foreground">
+                  追加の要望・制約
+                </Label>
+                <Input
+                  id="extra"
+                  placeholder="例: ハッシュタグを5個含める"
+                  value={extra}
+                  onChange={(e) => setExtra(e.target.value)}
+                  className="rounded-lg"
+                />
+              </div>
+            </div>
+            )}
+          </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="audience">対象ユーザー（任意）</Label>
-        <Input
-          id="audience"
-          placeholder="例: 20代女性"
-          value={audience}
-          onChange={(e) => setAudience(e.target.value)}
-        />
-      </div>
+          <Button
+            onClick={handleGenerate}
+            disabled={!canGenerate || isLoading}
+            size="lg"
+            className="w-full h-11 text-base font-medium rounded-lg"
+          >
+            {isLoading ? (
+              <>
+                <LoadingSpinner size="sm" className="mr-2" />
+                生成中...
+              </>
+            ) : (
+              <>
+                <Zap className="h-5 w-5 mr-2" />
+                プロンプトを生成
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
 
-      <div className="space-y-2">
-        <Label htmlFor="extra">追加の要望・制約（任意）</Label>
-        <Input
-          id="extra"
-          placeholder="例: ハッシュタグを5個含める"
-          value={extra}
-          onChange={(e) => setExtra(e.target.value)}
-        />
-      </div>
-
-      <Button
-        onClick={handleGenerate}
-        disabled={!canGenerate || isLoading}
-        size="lg"
-        className="w-full sm:w-auto"
-      >
-        {isLoading ? (
-          <>
-            <LoadingSpinner size="sm" className="mr-2" />
-            生成中...
-          </>
-        ) : (
-          "プロンプトを生成"
-        )}
-      </Button>
-
+      {/* 結果表示 */}
       {(result || isLoading) && (
-        <ResultDisplay
-          result={result}
-          isStreaming={isStreaming}
-          onRetry={handleRetry}
-        />
+        <div className="lg:sticky lg:top-20">
+          <ResultDisplay
+            result={result}
+            isStreaming={isStreaming}
+            onRetry={handleRetry}
+          />
+        </div>
       )}
     </div>
   );
