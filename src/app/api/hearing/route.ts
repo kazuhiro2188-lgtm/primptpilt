@@ -1,4 +1,4 @@
-import { Anthropic } from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { META_HEARING_SYSTEM } from "@/lib/prompts/hearing-system";
 import { z } from "zod";
 
@@ -12,10 +12,10 @@ const HearingSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return new Response(
-      JSON.stringify({ error: "APIキーが設定されていません" }),
+      JSON.stringify({ error: "APIキーが設定されていません（OPENAI_API_KEY）" }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
@@ -32,31 +32,32 @@ export async function POST(request: Request) {
 
     const { messages } = parsed.data;
 
-    const anthropic = new Anthropic({ apiKey });
+    const openai = new OpenAI({ apiKey });
 
-    const formattedMessages = messages.map((m) => ({
-      role: m.role as "user" | "assistant",
-      content: m.content,
-    }));
+    const formattedMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+      { role: "system", content: META_HEARING_SYSTEM },
+      ...messages.map((m) => ({
+        role: m.role as "user" | "assistant",
+        content: m.content,
+      })),
+    ];
 
-    const stream = await anthropic.messages.stream({
-      model: "claude-sonnet-4-20250514",
+    const stream = await openai.chat.completions.create({
+      model: "gpt-4o",
       max_tokens: 2048,
-      system: META_HEARING_SYSTEM,
+      stream: true,
       messages: formattedMessages,
     });
 
     const encoder = new TextEncoder();
     const readable = new ReadableStream({
       async start(controller) {
-        for await (const event of stream) {
-          if (
-            event.type === "content_block_delta" &&
-            event.delta.type === "text_delta"
-          ) {
+        for await (const chunk of stream) {
+          const text = chunk.choices[0]?.delta?.content;
+          if (text) {
             controller.enqueue(
               encoder.encode(
-                `data: ${JSON.stringify({ type: "text_delta", text: event.delta.text })}\n\n`
+                `data: ${JSON.stringify({ type: "text_delta", text })}\n\n`
               )
             );
           }

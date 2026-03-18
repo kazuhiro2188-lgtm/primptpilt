@@ -1,4 +1,4 @@
-import { Anthropic } from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { META_DIAGNOSE_SYSTEM } from "@/lib/prompts/diagnose-system";
 import { z } from "zod";
 
@@ -7,10 +7,10 @@ const DiagnoseSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return new Response(
-      JSON.stringify({ error: "APIキーが設定されていません" }),
+      JSON.stringify({ error: "APIキーが設定されていません（OPENAI_API_KEY）" }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
@@ -27,13 +27,13 @@ export async function POST(request: Request) {
 
     const { prompt } = parsed.data;
 
-    const anthropic = new Anthropic({ apiKey });
+    const openai = new OpenAI({ apiKey });
 
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
       max_tokens: 2048,
-      system: META_DIAGNOSE_SYSTEM,
       messages: [
+        { role: "system", content: META_DIAGNOSE_SYSTEM },
         {
           role: "user",
           content: `以下のプロンプトを診断してください。\n\n---\n${prompt}\n---`,
@@ -41,10 +41,7 @@ export async function POST(request: Request) {
       ],
     });
 
-    const text = message.content
-      .filter((c) => c.type === "text")
-      .map((c) => (c as { type: "text"; text: string }).text)
-      .join("");
+    const text = completion.choices[0]?.message?.content ?? "";
 
     // JSONを抽出（```json ... ``` で囲まれている場合も対応）
     let jsonStr = text.trim();
